@@ -69,7 +69,8 @@ class StorageWrapper:
             piece_size, finished, failed, 
             statusfunc = dummy_status, flag = fakeflag(), check_hashes = True,
             data_flunked = lambda x: None, backfunc = None,
-            config = {}, unpauseflag = fakeflag(True) ):
+            config = {}, unpauseflag = fakeflag(True), 
+            numstripe = 1, stripenum = 1 ):
         self.storage = storage
         self.request_size = long(request_size)
         self.hashes = hashes
@@ -104,6 +105,10 @@ class StorageWrapper:
         self.amount_obtained = 0
         self.amount_desired = self.total_length
         self.have = Bitfield(len(hashes))
+        for i in range(len(hashes)):
+            if i % numstripe == stripenum:
+                self.have[i] = true
+            
         self.have_cloaked_data = None
         self.blocked = [False] * len(hashes)
         self.blocked_holes = []

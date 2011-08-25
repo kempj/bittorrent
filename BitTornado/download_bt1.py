@@ -157,6 +157,10 @@ defaults = [
         "minutes between automatic flushes to disk (0 = disabled)"),
     ('dedicated_seed_id', '',
         "code to send to tracker identifying as a dedicated seed"),
+    ('stripe_number',1,
+        "Test feature, stripes downloads across nodes, requires num_stripes to be set"),
+    ('num_stripes',1,
+        "Test feature, number of nodes striped across"),
     ]
 
 argslistheader = 'Arguments are:\n\n'
@@ -312,7 +316,9 @@ def get_response(file, url, errorfunc):
 class BT1Download:    
     def __init__(self, statusfunc, finfunc, errorfunc, excfunc, doneflag,
                  config, response, infohash, id, rawserver, port,
-                 appdataobj = None):
+                 appdataobj = None, numstripe = 1, stripenum = 1):
+        self.stripenum = stripenum
+        self.numstripe = numstripe
         self.statusfunc = statusfunc
         self.finfunc = finfunc
         self.errorfunc = errorfunc
@@ -517,7 +523,7 @@ class BT1Download:
                 self.pieces, self.info['piece length'], self._finished, self._failed,
                 statusfunc, self.doneflag, self.config['check_hashes'],
                 self._data_flunked, self.rawserver.add_task,
-                self.config, self.unpauseflag)
+                self.config, self.unpauseflag, self.numstripe, self.stripenum)
             
         except ValueError, e:
             self._failed('bad data - ' + str(e))

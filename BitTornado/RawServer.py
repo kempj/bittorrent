@@ -28,16 +28,16 @@ def autodetect_ipv6():
     return 1
 
 def autodetect_socket_style():
-	if sys.platform.find('linux') < 0:
-		return 1
-	else:
-		try:
-			f = open('/proc/sys/net/ipv6/bindv6only','r')
-			dual_socket_style = int(f.read())
-			f.close()
-			return int(not dual_socket_style)
-		except:
-			return 0
+    if sys.platform.find('linux') < 0:
+        return 1
+    else:
+        try:
+            f = open('/proc/sys/net/ipv6/bindv6only','r')
+            dual_socket_style = int(f.read())
+            f.close()
+            return int(not dual_socket_style)
+        except:
+            return 0
 
 
 READSIZE = 100000
@@ -61,7 +61,7 @@ class RawServer:
         self.finished = Event()
         self.tasks_to_kill = []
         self.excflag = excflag
-        
+
         if sockethandler is None:
             sockethandler = SocketHandler(timeout, ipv6_enable, READSIZE)
         self.sockethandler = sockethandler
@@ -83,13 +83,13 @@ class RawServer:
         self.sockethandler.scan_for_timeouts()
 
     def bind(self, port, bind = '', reuse = False,
-                        ipv6_socket_style = 1, upnp = False):
+             ipv6_socket_style = 1, upnp = False):
         self.sockethandler.bind(port, bind, reuse, ipv6_socket_style, upnp)
 
     def find_and_bind(self, minport, maxport, bind = '', reuse = False,
                       ipv6_socket_style = 1, upnp = 0, randomizer = False):
         return self.sockethandler.find_and_bind(minport, maxport, bind, reuse,
-                                 ipv6_socket_style, upnp, randomizer)
+                                                ipv6_socket_style, upnp, randomizer)
 
     def start_connection_raw(self, dns, socktype, handler = None):
         return self.sockethandler.start_connection_raw(dns, socktype, handler)
@@ -127,7 +127,7 @@ class RawServer:
                         if id in self.tasks_to_kill:
                             pass
                         try:
-#                            print func.func_name
+                            #print func.func_name
                             func()
                         except (SystemError, MemoryError), e:
                             self.failfunc(str(e))
