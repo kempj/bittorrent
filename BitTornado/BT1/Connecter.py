@@ -212,6 +212,7 @@ class Connecter:
                or len(conn.upload.buffer) > 0):
             self.ratelimiter.queue(conn)
             
+            #JK
     def got_piece(self, i):
         for co in self.connections.values():
             co.send_have(i)

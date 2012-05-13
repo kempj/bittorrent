@@ -157,7 +157,7 @@ defaults = [
         "minutes between automatic flushes to disk (0 = disabled)"),
     ('dedicated_seed_id', '',
         "code to send to tracker identifying as a dedicated seed"),
-    ('stripe_number',1,
+    ('stripe_number',0,
         "Test feature, stripes downloads across nodes, requires num_stripes to be set"),
     ('num_stripes',1,
         "Test feature, number of nodes striped across"),
@@ -316,9 +316,9 @@ def get_response(file, url, errorfunc):
 class BT1Download:    
     def __init__(self, statusfunc, finfunc, errorfunc, excfunc, doneflag,
                  config, response, infohash, id, rawserver, port,
-                 appdataobj = None, numstripe = 1, stripenum = 1):
-        self.stripenum = stripenum
-        self.numstripe = numstripe
+                 appdataobj = None):
+        self.stripenum = config['stripe_number']#jk
+        self.numstripe = config['num_stripes']#jk
         self.statusfunc = statusfunc
         self.finfunc = finfunc
         self.errorfunc = errorfunc
@@ -364,7 +364,7 @@ class BT1Download:
         self.started = False
 
         self.picker = PiecePicker(self.len_pieces, config['rarest_first_cutoff'],
-                             config['rarest_first_priority_cutoff'])
+                             config['rarest_first_priority_cutoff'],20, self.stripenum, self.numstripe)
         self.choker = Choker(config, rawserver.add_task,
                              self.picker, self.finflag.isSet)
 
@@ -595,7 +595,7 @@ class BT1Download:
 
         self.checking = False
 
-        for i in xrange(self.len_pieces):
+        for i in xrange(self.len_pieces):#this is where it checks for what pieces I have at start
             if self.storagewrapper.do_I_have(i):
                 self.picker.complete(i)
         self.upmeasure = Measure(self.config['max_rate_period'],

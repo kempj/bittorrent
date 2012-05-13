@@ -197,11 +197,11 @@ def run(params):
 
         infohash = sha(bencode(response['info'])).digest()
 
-        numstripe = config['num_stripes']
-        stripenum = config['stripe_number']
+        #numstripe = config['num_stripes']
+        #stripenum = config['stripe_number']
         dow = BT1Download(h.display, h.finished, h.error, disp_exception, doneflag,
                         config, response, infohash, myid, rawserver, listen_port,
-                        configdir, numstripe, stripenum)
+                        configdir)
         
         if not dow.saveAs(h.chooseFile, h.newpath):
             break

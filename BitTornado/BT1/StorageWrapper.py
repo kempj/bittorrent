@@ -105,10 +105,12 @@ class StorageWrapper:
         self.amount_obtained = 0
         self.amount_desired = self.total_length
         self.have = Bitfield(len(hashes))
-        for i in range(len(hashes)):
-            if i % numstripe == stripenum:
-                self.have[i] = true
-            
+        
+        self.numstripe = numstripe
+        self.stripenum = stripenum
+        #for i in range(len(hashes)):
+        #    if i % numstripe == stripenum:
+        #        self.have[i] = true
         self.have_cloaked_data = None
         self.blocked = [False] * len(hashes)
         self.blocked_holes = []
@@ -201,7 +203,7 @@ class StorageWrapper:
         if self.flag.isSet():
             return False
         self.check_list = []
-        if len(self.hashes) == 0 or self.amount_left == 0:
+        if len(self.hashes) == 0 or self.amount_left <= (self.total_length / self.numstripe):#or self.amount_left == 0:
             self.check_total = 0
             self.finished()
             return False
@@ -290,7 +292,7 @@ class StorageWrapper:
             else:
                 self.places[i] = i
         self.numchecked += 1
-        if self.amount_left == 0:
+        if self.amount_left <= (self.total_length / self.numstripe):#== 0:
             self.finished()
         return (self.numchecked / self.check_total)
 
@@ -734,7 +736,7 @@ class StorageWrapper:
                     d.failed(index)
             del self.failed_pieces[index]
 
-        if self.amount_left == 0:
+        if self.amount_left <= (self.total_length / self.numstripe):#== 0:
             self.finished()
         return True
 

@@ -12,7 +12,7 @@ except:
 class PiecePicker:
     def __init__(self, numpieces,
                  rarest_first_cutoff = 1, rarest_first_priority_cutoff = 3,
-                 priority_step = 20):
+                 priority_step = 20, stripenum = 0,  numstripes = 1):
         self.rarest_first_cutoff = rarest_first_cutoff
         self.rarest_first_priority_cutoff = rarest_first_priority_cutoff + priority_step
         self.priority_step = priority_step
@@ -34,6 +34,8 @@ class PiecePicker:
         self.superseed = False
         self.seeds_connected = 0
         self._init_interests()
+        self.numstripes = numstripes
+        self.stripenum = stripenum
 
     def _init_interests(self):
         self.interests = [[] for x in xrange(self.priority_step)]
@@ -100,7 +102,7 @@ class PiecePicker:
         l1[p] = q
         parray[q] = p
         del l1[-1]
-        newp = randrange(len(l2)+1)
+        newp = randrange(len(l2)+1)#TODO: maybe do a range/numstripes  and then multiply it out and add the stripenum
         if newp == len(l2):
             parray[piece] = len(l2)
             l2.append(piece)
@@ -156,7 +158,13 @@ class PiecePicker:
         assert not self.has[piece]
         self.has[piece] = 1
         self.numgot += 1
-        if self.numgot == self.numpieces:
+        #This will need to be changed, or else self.numpieces needs to be changed.
+        #if self.numgot == self.numpieces:
+        if (self.numpieces % self.numstripes == self.stripenum):
+            leftover = 1
+        else:
+            leftover = 0        
+        if self.numgot == (self.numpieces / self.numstripes ) + leftover:
             self.done = True
             self.crosscount2 = self.crosscount
         else:
@@ -168,6 +176,7 @@ class PiecePicker:
         self._remove_from_interests(piece)
 
 
+#I think this is the main piece. change to not count the striped pieces.
     def next(self, haves, wantfunc, complete_first = False):
         cutoff = self.numgot < self.rarest_first_cutoff
         complete_first = (complete_first or cutoff) and not haves.complete()
@@ -191,7 +200,8 @@ class PiecePicker:
         for lo,hi in r:
             for i in xrange(lo,hi):
                 for j in self.interests[i]:
-                    if haves[j] and wantfunc(j):
+                    if (haves[j] and wantfunc(j) and (j%self.numstripes == self.stripenum)):
+                        #if haves[j] and wantfunc(j):#jk
                         return j
         if best is not None:
             return best
